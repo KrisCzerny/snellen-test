@@ -25,44 +25,44 @@ namespace snellentest {
         }
 
     private:
-        Button^ btnSnellenTest;   // Tlaèítko pro test zrakové ostrosti
-        Button^ btnVisionTraining; // Tlaèítko pro trénink zrakové ostrosti
+        Button^ btnSnellenTest;   // TlaÄÃ­tko pro test zrakovÃ© ostrosti
+        Button^ btnVisionTraining; // TlaÄÃ­tko pro trÃ©nink zrakovÃ© ostrosti
 
         void InitializeComponent(void)
         {
             this->btnSnellenTest = gcnew Button();
             this->btnVisionTraining = gcnew Button();
 
-            // Nastavení tlaèítka pro test zrakové ostrosti
-            this->btnSnellenTest->Text = "Test zrakové ostrosti";
+            // NastavenÃ­ tlaÄÃ­tka pro test zrakovÃ© ostrosti
+            this->btnSnellenTest->Text = "Test zrakovÃ© ostrosti";
             this->btnSnellenTest->Location = System::Drawing::Point(100, 100);
             this->btnSnellenTest->Size = System::Drawing::Size(200, 50);
             this->btnSnellenTest->Click += gcnew EventHandler(this, &MainMenuForm::btnSnellenTest_Click);
 
-            // Nastavení tlaèítka pro trénink zrakové ostrosti
-            this->btnVisionTraining->Text = "Trénink zrakové ostrosti";
+            // NastavenÃ­ tlaÄÃ­tka pro trÃ©nink zrakovÃ© ostrosti
+            this->btnVisionTraining->Text = "TrÃ©nink zrakovÃ© ostrosti";
             this->btnVisionTraining->Location = System::Drawing::Point(100, 200);
             this->btnVisionTraining->Size = System::Drawing::Size(200, 50);
             this->btnVisionTraining->Click += gcnew EventHandler(this, &MainMenuForm::btnVisionTraining_Click);
 
-            // Pøidání tlaèítek do formuláøe
+            // PÅ™idÃ¡nÃ­ tlaÄÃ­tek do formulÃ¡Å™e
             this->Controls->Add(this->btnSnellenTest);
             this->Controls->Add(this->btnVisionTraining);
 
-            // Nastavení formuláøe
-            this->Text = "Hlavní menu";
+            // NastavenÃ­ formulÃ¡Å™e
+            this->Text = "HlavnÃ­ menu";
             this->Size = System::Drawing::Size(400, 400);
             this->StartPosition = FormStartPosition::CenterScreen;
         }
 
-        // Událost pro spuštìní testu zrakové ostrosti
+        // UdÃ¡lost pro spuÅ¡tÄ›nÃ­ testu zrakovÃ© ostrosti
         void btnSnellenTest_Click(Object^ sender, EventArgs^ e)
         {
             MainForm^ snellenTestForm = gcnew MainForm();
             snellenTestForm->ShowDialog();
         }
 
-        // Událost pro spuštìní tréninku zrakové ostrosti
+        // UdÃ¡lost pro spuÅ¡tÄ›nÃ­ trÃ©ninku zrakovÃ© ostrosti
        void btnVisionTraining_Click(Object^ sender, EventArgs^ e)
 {
     VisionTrainingForm^ visionTrainingForm = gcnew VisionTrainingForm();
