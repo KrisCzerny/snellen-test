@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdlib>
 #include <ctime>
-#include <string>
+#include <msclr/marshal_cppstd.h>
 
 namespace snellentest {
 
@@ -13,7 +13,7 @@ namespace snellentest {
     public:
         VisionTrainingForm()
         {
-            srand((unsigned int)time(0)); // Inicializace generátoru náhodných èísel
+            srand(static_cast<unsigned int>(time(0))); // Inicializace generÃ¡toru nÃ¡hodnÃ½ch ÄÃ­sel
             InitializeComponent();
         }
 
@@ -28,106 +28,116 @@ namespace snellentest {
 
     private:
         Label^ lblSnellenText;
-        TextBox^ txtUserInput;
         Label^ lblFeedback;
-        Button^ btnSetFontSize;
-        NumericUpDown^ numFontSize;
-        ComboBox^ cmbFontName;
+        TextBox^ txtErrorLog; // TextovÃ© pole pro zobrazenÃ­ chyb
+        NumericUpDown^ numFontSize; // ÄŒÃ­selnÃ­k pro nastavenÃ­ velikosti fontu
+        ComboBox^ cmbFontName; // VÃ½bÄ›r fontu
+        Button^ btnSetFontSize; // TlaÄÃ­tko pro nastavenÃ­ fontu
 
         System::Drawing::Font^ selectedFont;
 
         void InitializeComponent(void)
         {
             this->lblSnellenText = gcnew Label();
-            this->txtUserInput = gcnew TextBox();
             this->lblFeedback = gcnew Label();
-            this->btnSetFontSize = gcnew Button();
+            this->txtErrorLog = gcnew TextBox();
             this->numFontSize = gcnew NumericUpDown();
             this->cmbFontName = gcnew ComboBox();
+            this->btnSetFontSize = gcnew Button();
 
-            // Nastavení Labelu pro náhodné písmeno
+            // NastavenÃ­ vlastnosti KeyPreview
+            this->KeyPreview = true;
+
+            // Label pro zobrazenÃ­ nÃ¡hodnÃ©ho pÃ­smena
             this->lblSnellenText->Text = GetRandomLetter();
-            this->lblSnellenText->Location = System::Drawing::Point(150, 100);
+            this->lblSnellenText->Location = System::Drawing::Point(150, 50);
             this->lblSnellenText->Size = System::Drawing::Size(500, 150);
             this->selectedFont = gcnew System::Drawing::Font("Arial", 50);
             this->lblSnellenText->Font = this->selectedFont;
 
-            // Textové pole pro odpovìï
-            this->txtUserInput->Location = System::Drawing::Point(150, 300);
-            this->txtUserInput->Size = System::Drawing::Size(200, 40);
-            this->txtUserInput->Font = gcnew System::Drawing::Font("Arial", 20);
-            this->txtUserInput->KeyDown += gcnew KeyEventHandler(this, &VisionTrainingForm::txtUserInput_KeyDown);
-
             // Feedback Label
-            this->lblFeedback->Location = System::Drawing::Point(150, 350);
+            this->lblFeedback->Location = System::Drawing::Point(150, 220);
             this->lblFeedback->Size = System::Drawing::Size(400, 40);
             this->lblFeedback->Font = gcnew System::Drawing::Font("Arial", 16);
 
-            // Tlaèítko pro nastavení velikosti
-            this->btnSetFontSize->Text = "Nastavit velikost";
-            this->btnSetFontSize->Location = System::Drawing::Point(400, 400);
-            this->btnSetFontSize->Click += gcnew EventHandler(this, &VisionTrainingForm::btnSetFontSize_Click);
+            // TextovÃ© pole pro log chyb
+            this->txtErrorLog->Location = System::Drawing::Point(150, 270);
+            this->txtErrorLog->Size = System::Drawing::Size(500, 150);
+            this->txtErrorLog->Font = gcnew System::Drawing::Font("Arial", 12);
+            this->txtErrorLog->Multiline = true;
+            this->txtErrorLog->ReadOnly = true;
+            this->txtErrorLog->ScrollBars = ScrollBars::Vertical;
 
-            // Èíselník pro velikost fontu
-            this->numFontSize->Location = System::Drawing::Point(150, 400);
+            // ÄŒÃ­selnÃ­k pro nastavenÃ­ velikosti fontu
+            this->numFontSize->Location = System::Drawing::Point(150, 450);
             this->numFontSize->Minimum = 10;
             this->numFontSize->Maximum = 200;
             this->numFontSize->Value = 50;
+            this->numFontSize->Size = System::Drawing::Size(100, 30);
 
-            // Výbìr fontu
-            this->cmbFontName->Location = System::Drawing::Point(150, 450);
-            this->cmbFontName->Size = System::Drawing::Size(200, 40);
+            // ComboBox pro vÃ½bÄ›r fontu
+            this->cmbFontName->Location = System::Drawing::Point(280, 450);
+            this->cmbFontName->Size = System::Drawing::Size(200, 30);
             this->cmbFontName->Items->AddRange(gcnew cli::array<Object^> { "Arial", "Times New Roman", "Verdana", "Courier New" });
             this->cmbFontName->SelectedIndex = 0;
 
-            // Pøidání komponent do formuláøe
+            // TlaÄÃ­tko pro potvrzenÃ­ nastavenÃ­ fontu
+            this->btnSetFontSize->Text = "Nastavit font";
+            this->btnSetFontSize->Location = System::Drawing::Point(500, 450);
+            this->btnSetFontSize->Size = System::Drawing::Size(150, 30);
+            this->btnSetFontSize->Click += gcnew EventHandler(this, &VisionTrainingForm::btnSetFontSize_Click);
+
+            // PÅ™idÃ¡nÃ­ obsluhy udÃ¡losti KeyPress
+            this->KeyPress += gcnew KeyPressEventHandler(this, &VisionTrainingForm::Form_KeyPress);
+
+            // PÅ™idÃ¡nÃ­ komponent do formulÃ¡Å™e
             this->Controls->Add(this->lblSnellenText);
-            this->Controls->Add(this->txtUserInput);
             this->Controls->Add(this->lblFeedback);
-            this->Controls->Add(this->btnSetFontSize);
+            this->Controls->Add(this->txtErrorLog);
             this->Controls->Add(this->numFontSize);
             this->Controls->Add(this->cmbFontName);
+            this->Controls->Add(this->btnSetFontSize);
 
-            this->Text = "Trénink zrakové ostrosti";
+            this->Text = "TrÃ©nink zrakovÃ© ostrosti";
             this->Size = System::Drawing::Size(800, 600);
             this->StartPosition = FormStartPosition::CenterScreen;
         }
 
-        // Funkce pro generování náhodného písmene
+        // Funkce pro generovÃ¡nÃ­ nÃ¡hodnÃ©ho pÃ­smene
         String^ GetRandomLetter()
         {
-            char letter = 'A' + (rand() % 26); // Generuje náhodné písmeno od 'A' do 'Z'
+            char letter = 'A' + (rand() % 26); // Generuje nÃ¡hodnÃ© pÃ­smeno od 'A' do 'Z'
             return gcnew String(letter, 1);
         }
 
-        // Obsluha Enter klávesy
-        void txtUserInput_KeyDown(Object^ sender, KeyEventArgs^ e)
+        // Obsluha udÃ¡losti KeyPress
+        void Form_KeyPress(Object^ sender, KeyPressEventArgs^ e)
         {
-            if (e->KeyCode == Keys::Enter)
+            String^ userInput = gcnew String(Char::ToUpper(e->KeyChar).ToString());
+            String^ correctText = this->lblSnellenText->Text;
+
+            if (userInput->Equals(correctText->ToUpper()))
             {
-                String^ userInput = this->txtUserInput->Text;
-                String^ correctText = this->lblSnellenText->Text;
-
-                if (userInput->ToUpper()->Equals(correctText->ToUpper()))
-                {
-                    this->lblFeedback->Text = "Správnì!";
-                    this->lblFeedback->ForeColor = System::Drawing::Color::Green;
-                }
-                else
-                {
-                    this->lblFeedback->Text = "Špatnì, zkuste to znovu.";
-                    this->lblFeedback->ForeColor = System::Drawing::Color::Red;
-                }
-
-                this->txtUserInput->Text = "";               // Vymaže text uživatele
-                this->lblSnellenText->Text = GetRandomLetter(); // Zobrazí nové písmeno
+                this->lblFeedback->Text = "SprÃ¡vnÄ›!";
+                this->lblFeedback->ForeColor = System::Drawing::Color::Green;
             }
+            else
+            {
+                this->lblFeedback->Text = "Å patnÄ›!";
+                this->lblFeedback->ForeColor = System::Drawing::Color::Red;
+
+                // ZÃ¡pis chyby do textovÃ©ho pole
+                this->txtErrorLog->AppendText("OÄekÃ¡vÃ¡no: " + correctText + ", ZadanÃ©: " + userInput + "\r\n");
+            }
+
+            // GenerovÃ¡nÃ­ novÃ©ho pÃ­smene
+            this->lblSnellenText->Text = GetRandomLetter();
         }
 
-        // Nastavení nové velikosti a fontu
+        // NastavenÃ­ novÃ© velikosti a fontu
         void btnSetFontSize_Click(Object^ sender, EventArgs^ e)
         {
-            float fontSize = (float)this->numFontSize->Value;
+            float fontSize = static_cast<float>(this->numFontSize->Value);
             String^ fontName = this->cmbFontName->SelectedItem->ToString();
 
             this->selectedFont = gcnew System::Drawing::Font(fontName, fontSize);
