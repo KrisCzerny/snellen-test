@@ -1,8 +1,10 @@
 #pragma once
 
-#include <cstdlib>  // Pro generování náhodnıch èísel
-#include <ctime>    // Pro inicializaci generátoru náhodnıch èísel
+#include <cstdlib>  // Pro generovÃ¡nÃ­ nÃ¡hodnÃ½ch ÄÃ­sel
+#include <ctime>    // Pro inicializaci generÃ¡toru nÃ¡hodnÃ½ch ÄÃ­sel
+#include <msclr/marshal_cppstd.h> // Pro pÅ™evod String^ na std::string
 #include "MainForm.h"
+
 namespace snellentest {
 
     using namespace System;
@@ -13,14 +15,14 @@ namespace snellentest {
     public:
         MainForm()
         {
-            srand((unsigned int)time(0)); // Inicializace generátoru náhodnıch èísel
+            srand(static_cast<unsigned int>(time(0))); // Inicializace generÃ¡toru nÃ¡hodnÃ½ch ÄÃ­sel
             InitializeComponent();
         }
 
     protected:
         ~MainForm()
         {
-            if (components)
+            if (components != nullptr) // Kontrola na CLR nullptr
             {
                 delete components;
             }
@@ -28,140 +30,175 @@ namespace snellentest {
 
     private:
         Button^ btnRestart;
+        Button^ btnEndTest; // TlaÄÃ­tko pro ukonÄenÃ­ testu
         Label^ lblSnellenText;
         TextBox^ txtUserInput;
-        Label^ lblFeedback; // Novı label pro zpìtnou vazbu
-        int correctAnswers; // Poèet správnıch odpovìdí
-        int currentLevel;   // Aktuální úroveò testu
-        System::Drawing::Font^ baseFont; // Vıchozí font
+        Label^ lblFeedback;
+        TextBox^ txtTestResult; // TextovÃ© pole pro zobrazenÃ­ vÃ½sledkÅ¯
+        int correctAnswers;
+        int currentLevel;
+        int totalAttempts; // PoÄet celkovÃ½ch pokusÅ¯
+        int errors; // PoÄet chyb
+        System::Drawing::Font^ currentFont;
 
         void InitializeComponent(void)
         {
             this->btnRestart = gcnew Button();
+            this->btnEndTest = gcnew Button(); // TlaÄÃ­tko pro ukonÄenÃ­ testu
             this->lblSnellenText = gcnew Label();
             this->txtUserInput = gcnew TextBox();
-            this->lblFeedback = gcnew Label(); // Inicializace feedback labelu
+            this->lblFeedback = gcnew Label();
+            this->txtTestResult = gcnew TextBox(); // NovÃ© textovÃ© pole
 
-            this->correctAnswers = 0; // Inicializace správnıch odpovìdí
-            this->currentLevel = 1;  // Start na 1. úrovni
-            this->baseFont = gcnew System::Drawing::Font("Optician Sans", 100); // Zaèínáme s fontem velikosti 200 (pro 20/200)
-            this->baseFont = gcnew System::Drawing::Font("Optician Sans", this->baseFont->Size, this->baseFont->Style);
-            // Nastavení tlaèítka Restart
+            this->correctAnswers = 0;
+            this->currentLevel = 1;
+            this->totalAttempts = 0;
+            this->errors = 0;
+            this->currentFont = gcnew System::Drawing::Font("Optician Sans", 80);
+
+            // NastavenÃ­ tlaÄÃ­tka Restart
             this->btnRestart->Text = "Restart";
-            this->btnRestart->Location = System::Drawing::Point(100, 500); // Zvìtšení prostoru pro tlaèítko
+            this->btnRestart->Location = System::Drawing::Point(20, 300);
+            this->btnRestart->Size = System::Drawing::Size(120, 40);
             this->btnRestart->Click += gcnew EventHandler(this, &MainForm::btnRestart_Click);
 
-            // Nastavení labelu pro náhodné písmeno
-            this->lblSnellenText->Text = GetRandomLetter(); // Generuje první písmeno
-            this->lblSnellenText->Location = System::Drawing::Point(350, 100); // Zvìtšení prostoru pro text
-            this->lblSnellenText->Size = System::Drawing::Size(600, 150); // Zvìtšení oblasti pro zobrazení písmen
-            this->lblSnellenText->Font = this->baseFont;
+            // NastavenÃ­ tlaÄÃ­tka UkonÄit test
+            this->btnEndTest->Text = "UkonÄit test";
+            this->btnEndTest->Location = System::Drawing::Point(160, 300);
+            this->btnEndTest->Size = System::Drawing::Size(120, 40);
+            this->btnEndTest->Click += gcnew EventHandler(this, &MainForm::btnEndTest_Click);
 
-            // Nastavení textového pole
-            this->txtUserInput->Location = System::Drawing::Point(100, 300); // Zvìtšení oblasti pro zadání
-            this->txtUserInput->Size = System::Drawing::Size(400, 40);
-            this->txtUserInput->Font = gcnew System::Drawing::Font("Arial", 20);
-            this->txtUserInput->KeyDown += gcnew KeyEventHandler(this, &MainForm::txtUserInput_KeyDown); // Pøidání obsluhy pro klávesu Enter
+            // NastavenÃ­ labelu pro nÃ¡hodnÃ© pÃ­smeno
+            this->lblSnellenText->Text = GetRandomLetter();
+            this->lblSnellenText->Size = System::Drawing::Size(300, 100);
+            this->lblSnellenText->Font = this->currentFont;
 
-            // Nastavení feedback labelu pro zobrazení zpìtné vazby
-            this->lblFeedback->Location = System::Drawing::Point(100, 350);
-            this->lblFeedback->Size = System::Drawing::Size(400, 40);
-            this->lblFeedback->Font = gcnew System::Drawing::Font("Arial", 20);
+            // NastavenÃ­ textovÃ©ho pole pro zadÃ¡vÃ¡nÃ­ odpovÄ›dÃ­
+            this->txtUserInput->Location = System::Drawing::Point(20, 200);
+            this->txtUserInput->Size = System::Drawing::Size(200, 40);
+            this->txtUserInput->Font = gcnew System::Drawing::Font("Arial", 14);
+            this->txtUserInput->KeyDown += gcnew KeyEventHandler(this, &MainForm::txtUserInput_KeyDown);
 
-            // Pøidání komponent do formuláøe
+            // NastavenÃ­ zpÄ›tnÃ© vazby
+            this->lblFeedback->Location = System::Drawing::Point(20, 250);
+            this->lblFeedback->Size = System::Drawing::Size(300, 40);
+            this->lblFeedback->Font = gcnew System::Drawing::Font("Arial", 12);
+
+            // NastavenÃ­ textovÃ©ho pole pro vÃ½sledky testu
+            this->txtTestResult->Location = System::Drawing::Point(20, 360);
+            this->txtTestResult->Size = System::Drawing::Size(300, 80);
+            this->txtTestResult->Font = gcnew System::Drawing::Font("Arial", 10);
+            this->txtTestResult->Multiline = true;
+            this->txtTestResult->ReadOnly = true;
+
+            // PÅ™idÃ¡nÃ­ komponent do formulÃ¡Å™e
             this->Controls->Add(this->btnRestart);
+            this->Controls->Add(this->btnEndTest);
             this->Controls->Add(this->lblSnellenText);
             this->Controls->Add(this->txtUserInput);
             this->Controls->Add(this->lblFeedback);
+            this->Controls->Add(this->txtTestResult);
 
-            this->Text = "Test zrakové ostrosti";
-            this->Size = System::Drawing::Size(800, 600);  // Zvìtšení okna aplikace
-
-            // Zajistí, e okno nebude moné zmìnit
-            this->MaximumSize = this->Size;
-            this->MinimumSize = this->Size;
-
-            // Umístìní okna na støed obrazovky
+            // NastavenÃ­ formulÃ¡Å™e
+            this->Text = "Test zrakovÃ© ostrosti";
+            this->Size = System::Drawing::Size(1280, 720); // NastavenÃ­ okna na specifickou velikost
             this->StartPosition = FormStartPosition::CenterScreen;
+
+            CenterLabel();
         }
 
-        // Funkce pro generování náhodného písmene
         String^ GetRandomLetter()
         {
-            char letter = 'A' + (rand() % 26); // Generuje náhodné písmeno od 'A' do 'Z'
+            char letter = 'A' + (rand() % 26);
             return gcnew String(letter, 1);
         }
 
-        // Obsluha tlaèítka Restart
-        void btnRestart_Click(Object^ sender, EventArgs^ e)
+        void CenterLabel()
         {
-            this->txtUserInput->Text = "";       // Vymae text
-            this->lblSnellenText->Text = GetRandomLetter(); // Generuje nové písmeno
-            this->lblSnellenText->Font = this->baseFont; // Reset fontu
-            this->correctAnswers = 0;           // Reset správnıch odpovìdí
-            this->currentLevel = 1;             // Reset úrovnì
-            this->lblFeedback->Text = "";      // Vymae zpìtnou vazbu
+            int centerX = (this->ClientSize.Width - this->lblSnellenText->Width) / 2 + 50; // Posun doprava o 50 pixelÅ¯
+            int centerY = (this->ClientSize.Height - this->lblSnellenText->Height) / 2;
+            this->lblSnellenText->Location = System::Drawing::Point(centerX, centerY);
         }
 
-        // Obsluha stisknutí klávesy Enter
+        void btnRestart_Click(Object^ sender, EventArgs^ e)
+        {
+            this->txtUserInput->Text = "";
+            this->lblSnellenText->Text = GetRandomLetter();
+            this->lblSnellenText->Font = this->currentFont;
+            this->correctAnswers = 0;
+            this->currentLevel = 1;
+            this->totalAttempts = 0;
+            this->errors = 0;
+            this->lblFeedback->Text = "";
+            this->txtTestResult->Text = ""; // Vymazat vÃ½sledky testu
+            CenterLabel();
+        }
+
+        void btnEndTest_Click(Object^ sender, EventArgs^ e)
+        {
+            ShowFinalResults();
+        }
+
         void txtUserInput_KeyDown(Object^ sender, KeyEventArgs^ e)
         {
-            if (e->KeyCode == Keys::Enter) // Kontrola, zda byla stisknuta klávesa Enter
+            if (e->KeyCode == Keys::Enter)
             {
-                // Získání odpovìdi uivatele
                 String^ userInput = this->txtUserInput->Text;
                 String^ correctText = this->lblSnellenText->Text;
 
-                // Kontrola správnosti odpovìdi
+                this->totalAttempts++;
                 if (userInput->ToUpper()->Equals(correctText->ToUpper()))
                 {
                     this->correctAnswers++;
-                    this->lblFeedback->Text = "Správnì!";
+                    this->lblFeedback->Text = "SprÃ¡vnÄ›!";
                     this->lblFeedback->ForeColor = System::Drawing::Color::Green;
                 }
                 else
                 {
-                    this->lblFeedback->Text = "Špatnì! Zkuste to znovu.";
+                    this->errors++;
+                    this->lblFeedback->Text = "Å patnÄ›!";
                     this->lblFeedback->ForeColor = System::Drawing::Color::Red;
                 }
 
-                // Kontrola postupu do další úrovnì
                 if (this->correctAnswers >= 3)
                 {
                     AdvanceToNextLevel();
                 }
                 else
                 {
-                    // Generování nového písmena pro aktuální úroveò
                     this->lblSnellenText->Text = GetRandomLetter();
+                    CenterLabel();
                 }
 
-                // Vymazání vstupu
                 this->txtUserInput->Text = "";
             }
         }
 
-        // Postup do další úrovnì
         void AdvanceToNextLevel()
         {
-            this->correctAnswers = 0; // Reset poètu správnıch odpovìdí
+            this->correctAnswers = 0;
             this->currentLevel++;
 
-            // Sníení velikosti fontu (zmenšení textu)
-            //float newFontSize = this->baseFont->Size;
-            float newFontSize = this->baseFont->Size - (this->currentLevel - 1) * 20.0f;
-            // Zajistíme, e velikost písma nebude menší ne 8
-            newFontSize = Math::Max(8.0f, newFontSize);
+            float newFontSize = this->currentFont->Size - 10.0f; // ZmenÅ¡enÃ­ fontu
+            if (newFontSize < 10.0f)
+                newFontSize = 10.0f;
 
-            // Aplikujeme novou velikost fontu na label
-            this->lblSnellenText->Font = gcnew System::Drawing::Font("Arial", newFontSize);
-
-            // Generování nového náhodného písmene
+            this->currentFont = gcnew System::Drawing::Font("Optician Sans", newFontSize);
+            this->lblSnellenText->Font = this->currentFont;
             this->lblSnellenText->Text = GetRandomLetter();
-
-            this->lblFeedback->Text = "Postoupili jste na úroveò " + this->currentLevel + "!";
+            this->lblFeedback->Text = "Postup na ÃºroveÅˆ " + this->currentLevel.ToString();
             this->lblFeedback->ForeColor = System::Drawing::Color::Blue;
+            CenterLabel();
         }
+
+        void ShowFinalResults()
+        {
+            String^ result = "MaximÃ¡lnÃ­ dosaÅ¾enÃ¡ ostrost: ÃšroveÅˆ " + this->currentLevel.ToString() +
+                "\nCelkovÃ½ poÄet pokusÅ¯: " + this->totalAttempts.ToString() +
+                "\nCelkovÃ½ poÄet chyb: " + this->errors.ToString();
+            this->txtTestResult->Text = result; // ZobrazÃ­ vÃ½sledky v textovÃ©m poli
+        }
+
     private:
         System::ComponentModel::Container^ components;
     };
