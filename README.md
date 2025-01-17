@@ -1,115 +1,25 @@
 
 ### Popis aplikace
-Tato aplikace je desktopový program napsaný v C++ a zaměřuje se na testování vizuálních a senzorických schopností. Obsahuje následující klíčové funkce:
+Tato aplikace je zaměřena na testování a trénink vizuálních schopností. Obsahuje následující klíčové funkce:
 
 1. **Acuity testing (test ostrosti zraku):**
-   - Měří schopnost oka rozlišit detaily a ostrost.
-   - Využívá digitální optotypy, například simulaci Snellenovy tabulky.
+   - Měří schopnost oka rozlišit detaily a ostrost skrze zobrazení náhodných písmen o proměnné velikosti
+   - Využívá simulaci písmen Snellenovy tabulky.
+   - Test se standartně provádí ve vzdálenosti 10 stop (305 cm) za použití bezdrátové klávesnice
 2. **Acuity training (trénink ostrosti zraku):**
+   - Umožňuje trénink zrakové ostrosti s možností nastavení fontu i velikosti zobrazovaných písmen
 
-### Proč je aplikace užitečná?
-1. **Zdravotnictví:**
-   - Poskytuje nástroj pro diagnostiku očních vad (např. krátkozrakost, dalekozrakost, astigmatismus).
-   - Pomáhá sledovat progresi léčby nebo terapie.
+### Jak používat aplikaci
+Zdrojový kod aplikace byl napsán a otestován v prostředí Visual Studio 2022 s rozšířením a knihovnou funkcí pro CLR .NET framework. Tato aplikace je určená uživvatelům se základní znalostí Visual Studio 2022. 
 
-2. **Výzkum:**
-   - Podpora vědeckého zkoumání vizuálního vnímání.
-   - Nástroj pro analýzu vizuálních dat a lidského zraku.
+Při spuštění aplikace se zobrazí hlavní okno aplikace, jehož klíčové prvky jsou naprogramovány v souboru MainMenuForm.h
+Uživatel má možnost volit mezi dvěma možnostmi. Testem zrakové ostrosti a Tréninkem zrakové ostrosti.
+   Deklarace funkcí a tlačítek programu testu zrakové ostrosti jsou uloženy v souboru MainForm.h
+   Deklarace Tréninku ostrosti jsou v souboru VisualTrainingForm.h
+   Spouštění aplikace se provádí v souboru MainForm.cpp
 
-3. **Domácí použití:**
-   - Umožňuje lidem otestovat si zrak z pohodlí domova.
-   - Sleduje změny zraku v průběhu času.
+Po spuštění testu zrakové ostrosti je uživateli zobrazeno náhodné písmeno. Uživatel odpovídá zadáním písmene do pole odpovědi a stisknutím klávesy ENTER. Když odpoví 3x správně dojde ke zmenšení velikosti písmen. Pokud uživatel odpoví špatně více než 3x test by měl ukončit. Výsledkem testu je dosažená velikost písma. Test je možné opakovat, a tak sledovat případné zlepšení.
 
-4. **Personalizace:**
-   - Díky přizpůsobitelným testům může být aplikace atraktivní pro širokou škálu uživatelů.
-
----
-
-### Význam aplikace
-Aplikace zlepšuje přístupnost zrakových testů pro veřejnost, umožňuje personalizovanou diagnostiku a podporuje výzkum v oblasti vizuálního vnímání. Má potenciál být užitečná nejen ve zdravotnictví, ale i v dalších oblastech, jako je výuka, rehabilitace nebo sport.
-
----
-
-### Jak může trénink rozpoznávání písmen na dálku zlepšit zrakovou ostrost?
-1. **Diagnostika zrakových problémů:**
-   - Pomáhá identifikovat oční vady jako krátkozrakost nebo astigmatismus.
-   - Brzká diagnostika umožňuje efektivnější léčbu.
-
-2. **Sledování změn zraku:**
-   - Pravidelné testování umožňuje uživatelům sledovat progresi zlepšení nebo zhoršení.
-
-3. **Zlepšení prostřednictvím tréninku:**
-   - Trénink vizuálního zaměření a přesnosti může zlepšit schopnost oka zpracovávat detaily.
-   - Stimuluje neuroplasticitu mozku, což vede k efektivnějšímu zpracování vizuálních informací.
-
-4. **Motivace ke zlepšení:**
-   - Uživatelé mohou sledovat pokrok v reálném čase a být motivováni k dalšímu cvičení.
-
-5. **Trénink očních svalů:**
-   - Zlepšuje koordinaci očních svalů a jejich schopnost zaostřovat na různé vzdálenosti.
-
-6. **Praktické využití:**
-   - Vhodné například pro řidiče nebo sportovce, kde je přesnost zrakového vnímání klíčová.
-   - V části tréninku může být aplikace využita i k tréninku psaní deseti prsty
----
+Pokud si uživatel v hlavním okně zvolí možnost Trénink zrakové ostrosti, otevře se tréninkové okno. Zde si uživatel nastavuje velikost a font písma, které se bude zobrazovat. Po stisknutí tlačítka nastavit font se nový font zobrazí. Pak stačí jen kliknout do pole odpovědí a zadat písmeno. Není vyžadován ENTER pro potvrzení odpovědi.
 
 
-### Jak aplikace funguje
-Aplikace je navržena jako desktopový program s důrazem na uživatelskou přívětivost a přesnost měření. Její základní fungování zahrnuje:
-1. **Zobrazení vizuálních stimulů:**
-   - Zobrazuje písmena na obrazovce v přesně definované velikosti a vzdálenosti.
-2. **Interakce uživatele:**
-   - Uživatel reaguje na zobrazené podněty (např. zadává rozeznaná písmena, kliká správné možnosti).
-   - Data z těchto interakcí jsou zaznamenávána a vyhodnocována.
-
-3. **Analýza výsledků:**
-   - Program analyzuje odpovědi uživatele, aby určil úroveň zrakové ostrosti 
----
-
-### Základní části aplikace
-1. **Uživatelské rozhraní (GUI):**
-   - Intuitivní design, který umožňuje snadné ovládání.
-   - Přizpůsobitelné rozhraní pro různé typy uživatelů (např. pacienti, výzkumníci).
-
-2. **Zobrazovací modul:**
-   - Odpovídá za přesné vykreslení vizuálních podnětů.
-   - Podporuje různé formáty zobrazení.
-
-3. **Datový modul:**
-   - Zpracovává a ukládá výsledky testů.
-
-4. **Analyzační modul:**
-   - Vyhodnocuje výkon uživatele na základě odpovědí.
-  
-5. **Konfigurační modul:**
-   - Umožňuje upravit parametry testování (velikost písmen, font).
----
-
-### Možnosti zlepšení
-1. **Vylepšení uživatelského rozhraní:**
-   - Přidání podpory pro různé jazyky.
-   - Implementace hlasového ovládání nebo asistivních technologií.
-
-2. **Rozšíření funkcionality:**
-   - Přidání dalších typů testů (např. barvocit, prostorové vnímání).
-   - Možnost provádět testy na mobilních zařízeních.
-
-3. **Lepší personalizace:**
-   - Zavedení strojového učení pro adaptaci testů na základě historických dat uživatele.
-   - Ukládání pokroku a doporučení pro zlepšení.
-
-4. **Integrace s hardwarem:**
-   - Možnost propojení s očními kamerami nebo VR brýlemi pro přesnější měření.
-   - Podpora externích zařízení, jako jsou oční trackery.
-
-5. **Zlepšení přesnosti:**
-   - Zavedení pokročilejších algoritmů pro analýzu dat.
-   - Kalibrace aplikace podle rozlišení a specifikace monitoru.
-
-6. **Cloudová synchronizace:**
-   - Ukládání dat do cloudu, aby uživatelé mohli sledovat svůj progres na různých zařízeních.
-   - Sdílení výsledků s lékaři nebo terapeuty.
-
----
-
-Tato vylepšení by mohla výrazně zvýšit hodnotu aplikace jak pro individuální uživatele, tak pro profesionály. Klíčovou výhodou by byla škálovatelnost a přizpůsobivost široké škále situací a potřeb.
